@@ -28,7 +28,7 @@ jobs:
     if: contains(fronJson'["refs/heads/master", "refs/heads/main"]'), github.ref)
     runs-on: ubuntu-latest
     permissions:
-      contains: write
+      contents: write
 
     steps:
       - name: Code Checkout
@@ -62,7 +62,7 @@ jobs:
     if: contains(fronJson'["refs/heads/master", "refs/heads/main"]'), github.ref)
     runs-on: ubuntu-latest
     permissions:
-      contains: write
+      contents: write
 
     steps:
       - name: Code Checkout
