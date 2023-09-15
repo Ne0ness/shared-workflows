@@ -1,0 +1,93 @@
+name: Snyk-SCA-SAST-NodeJS
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Version of nodejs to run builds on'
+        required: false
+        type: string
+        default: ''
+
+      working-directory:
+        description: 'Version of nodejs to run builds on'
+        required: false
+        type: string
+        default: '.'
+
+    secrets:
+      snyk_org_name:
+        required: false
+      snyk_passwd:
+        required: false
+
+
+permissions: {}
+
+jobs:
+  Snyk_Default_Branch_Check:
+    if: contains(fronJson'["refs/heads/master", "refs/heads/main"]'), github.ref)
+    runs-on: ubuntu-latest
+    permissions:
+      contains: write
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4.0.0
+      - name: Check files
+        run: ls
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: ${{ inputs.nodejs-version }}
+          check-latest: true
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Snyk Install & Authenticate
+        run: |
+          sudo npm install -g snyk
+          snyk auth ${{ secrets.snyk_passwd }}
+
+# Runs Snyk Open Source (SCA) analysis and upload results to Snyk Cloud
+      - name: Snyk SCA Monitoring with upload results to Snyk Cloud
+        run: |
+          snyk monitor --org=${{ secrets.snyk_org }} --all-projects --severity-threshold=high
+          snyk test --all-projects --severity-threshold=high || true
+
+      - name: Snyk Code Scanning
+        run: |
+          snyk code test --all-projects --severity-threshold=high || true
+
+  Snyk_Feature_Branch_Check:
+    if: contains(fronJson'["refs/heads/master", "refs/heads/main"]'), github.ref)
+    runs-on: ubuntu-latest
+    permissions:
+      contains: write
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4.0.0
+      - name: Check files
+        run: ls
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: ${{ inputs.nodejs-version }}
+          check-latest: true
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Snyk Install & Authenticate
+        run: |
+          sudo npm install -g snyk
+          snyk auth ${{ secrets.snyk_passwd }}
+
+# Runs Snyk Open Source (SCA) analysis and upload results to Snyk Cloud
+      - name: Snyk SCA Monitoring with upload results to Snyk Cloud
+        run: |
+          snyk monitor --org=${{ secrets.snyk_org }} --all-projects --severity-threshold=high
+          snyk test --all-projects --severity-threshold=high || true
+
+      - name: Snyk Code Scanning
+        run: |
+          snyk code test --all-projects --severity-threshold=high || true
