@@ -59,7 +59,7 @@ jobs:
           snyk code test --all-projects --severity-threshold=high
 
   Snyk_Feature_Branch_Check:
-    #if: contains(fromJson('!["refs/heads/master", "refs/heads/main"]'), github.ref)
+    if: contains(fromJson !=('!["refs/heads/master", "refs/heads/main"]'), github.ref)
     runs-on: ubuntu-latest
     permissions:
       contents: write
